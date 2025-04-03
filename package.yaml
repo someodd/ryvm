@@ -1,0 +1,113 @@
+name: ryvm
+version: 0.43.0.0
+synopsis: Rank You Very Much. Like Google, but for your files. Formally verified. Properly tested.
+description: |
+  Static site builder, but for gopherholes. Manage phlogs with tags, use the Markdown renderer and Mustache templating system.
+homepage: https://github.com/someodd/bore
+bug-reports: https://github.com/someodd/bore/issues
+license: GPL-3.0-only
+license-file: LICENSE
+author: someodd
+maintainer: someodd@pm.pm
+category: Network
+extra-source-files:
+  - README.md
+  - CHANGELOG.md
+tested-with: GHC==9.6.3
+
+ghc-options:
+  - -threaded
+  - -rtsopts
+  - -with-rtsopts=-N
+  - -Wall
+  - -Werror
+
+dependencies:
+  - base
+  - text
+  - filepath-bytestring
+  - liquidhaskell
+  - unix
+  - fast-logger
+  - fsnotify
+  - tomland
+  - xml-conduit-writer
+  - parsec
+  - data-default
+  - xml-conduit
+  - word-wrap
+  - split
+  - fuzzy-dates
+  - hourglass
+  - bytestring
+  - containers
+  - filepattern
+  - hashmap
+  - directory
+  - unordered-containers
+  - filepath
+  - optparse-applicative
+  - mtl
+  - commonmark
+  - frontmatter
+  - ansi-wl-pprint
+  - commonmark
+  - attoparsec
+  - vector
+  - time
+  - hashable
+  - fuzzy-dates
+  - hourglass
+  - raw-strings-qq
+  - aeson
+  - network-uri
+  - prettyprinter
+  - commonmark-extensions
+  - neat-interpolation
+  - yaml
+  - spacecookie
+  - edit-distance
+  - safe
+  - mime-types
+  - regex-tdfa
+  - regex-compat
+
+library:
+  source-dirs: src
+  default-extensions:
+    - OverloadedStrings
+    - DeriveGeneric
+    - DeriveAnyClass
+    - OverloadedRecordDot
+    - DuplicateRecordFields
+  default-language: GHC2021
+
+executables:
+  ryvm:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - ryvm
+    autogen-modules:
+      - Paths_ryvm
+    other-modules:
+      - Paths_ryvm
+    default-extensions:
+      - OverloadedStrings
+      - DeriveGeneric
+      - DeriveAnyClass
+      - OverloadedRecordDot
+    default-language: GHC2021
+
+tests:
+  bore-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+    build-depends:
+      - ryvm
+      - QuickCheck
+      - text
+      - temporary
+      - doctest
+    default-language:    GHC2021
