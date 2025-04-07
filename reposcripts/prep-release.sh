@@ -21,7 +21,7 @@ fi
 
 # Update the version in package.yaml and the .cabal file.
 sed -i -E "s/^version: [0-9]+(\.[0-9]+)*$/version: $VERSION/" package.yaml
-sed -i -E "s/^version: [0-9]+(\.[0-9]+)*$/version: $VERSION/" ryvm.cabal
+sed -i -E "s/^version:[ \t]+[0-9]+(\.[0-9]+)*$/version: $VERSION/" ryvm.cabal
 
 # Update the `CHANGELOG.md``
 ./reposcripts/update-changelog.sh "$VERSION"

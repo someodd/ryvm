@@ -16,14 +16,13 @@ You can increase verbosity like this:
 module Main (main) where
 
 import Ryvm.Search
+import Ryvm.Text.Selector
 
 import System.Environment (getArgs)
 import Control.Monad
 import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Text.Encoding qualified as TE
 import Data.Text.IO qualified as TIO
-import Network.Gopher
 import System.FilePath
 import System.IO.Temp (withSystemTempDirectory)
 --import Test.DocTest (doctest)
@@ -129,19 +128,14 @@ prop_getSearchResultsRanking isVerbose (Keywords keywords) = ioProperty $ do
     response <- getSearchResults (T.unwords keywords) dir dir
 
     -- Extract file paths in the returned results (ordered by rank)
-    let rankedFiles = case response of
-          MenuResponse items -> [takeFileName (T.unpack (TE.decodeUtf8 selector)) | Item File _ selector _ _ <- items]
-          _ -> []
-    let items = case response of
-          MenuResponse i -> i
-          _ -> []
+    let rankedFiles = [takeFileName filepath | SearchResult {filePath=filepath} <- response]
 
     -- Useful information for debugging
     -- Can use: stack test --test-arguments "--verbose"
     if isVerbose
       then do
         putStrLn . show $ (zip fileNames fileContents)
-        _ <- forM  (items) $ \f -> putStrLn $ show f
+        _ <- forM  (response) $ \f -> putStrLn $ show f
         putStrLn "\n"
         pure ()
       else
