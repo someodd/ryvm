@@ -125,7 +125,7 @@ prop_getSearchResultsRanking isVerbose (Keywords keywords) = ioProperty $ do
       TIO.writeFile (dir </> fileName) content
 
     -- Call getSearchResults
-    response <- getSearchResults (T.unwords keywords) dir dir
+    response <- getSearchResults Nothing (T.unwords keywords) dir dir
 
     -- Extract file paths in the returned results (ordered by rank)
     let rankedFiles = [takeFileName filepath | SearchResult {filePath=filepath} <- response]

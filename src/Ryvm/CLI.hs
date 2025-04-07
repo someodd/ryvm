@@ -18,7 +18,7 @@ query = do
         q = T.pack q'
     
     -- Get the search results
-    results <- getSearchResults q path path
+    results <- getSearchResults Nothing q path path
     
     let resultsTsv = searchResultsToTsv results
     -- Print each line to stdout

@@ -205,45 +205,35 @@ addContext acc cs =
     then acc
     else acc ++ [cs]
 
+-- ADD FUNCTION WHERE IF TEXT -> BOOL IS TRUE THEN APPLY FILTER FUNCTION TEXT -> TEXT FIXME
 -- | Function to process multiple documents
 searchDocuments
-  :: [Text]
+  :: Maybe (Text -> Text)
+  -> [Text]
   -> AbsolutePath
   -> AbsolutePath
   -> IO [(FilePath, String, Bool, RankScore, [Text])]
   -- ^ The file path, the highlighted selector, whether it's a menu, the score, and the context snippets.
-searchDocuments keywords sourceDirectoryAbsolutePath absoluteOutputPath = do
+searchDocuments maybeFilterDocuments keywords _ absoluteOutputPath = do
   docPaths <- getTxtFiles absoluteOutputPath
   docs <-
     mapM
       ( \fp -> do
           content <- loadFileContent fp
-          (isMenu, hackedContent) <- gophermapHack fp content sourceDirectoryAbsolutePath absoluteOutputPath
-          pure (fp, isMenu, hackedContent)
+          let hackedContent = maybe content ($ content) maybeFilterDocuments
+          pure (fp, False, hackedContent)
       )
       docPaths
   return $
     map
-      ( \(fp, isMenu, content) ->
+      ( \(fp, _, content) ->
           let relativePath = makeRelative absoluteOutputPath fp
               (highlightedSelector, score, contexts) = rankDocument relativePath keywords content
               nonOverlappingContexts = combineContexts contexts
               contextTexts = map csText nonOverlappingContexts
-           in (fp, highlightedSelector, isMenu, score, contextTexts)
+           in (fp, highlightedSelector, False, score, contextTexts)
       )
       docs
-
--- | Check if a file is a gophermap. If it is, return the content without the gophermap syntax.
-gophermapHack :: FilePath -> Text -> AbsolutePath -> AbsolutePath -> IO (Bool, Text)
-gophermapHack fp content sourceDirectoryAbsolutePath absoluteOutputPath = do
-  let
-    filePathRelative = makeRelative absoluteOutputPath fp
-    pathHackToLoadFrontMatter = sourceDirectoryAbsolutePath </> filePathRelative
-  frontMatterContent <- loadFileContent pathHackToLoadFrontMatter
-  isGophermapFlag <- isGophermapFile frontMatterContent
-  if isGophermapFlag
-    then pure (True, removeGophermapSyntax content)
-    else pure (False, content)
 
 -- Recursively search for .txt files in a directory
 getTxtFiles :: FilePath -> IO [FilePath]
@@ -263,32 +253,10 @@ getTxtFiles dir = do
 loadFileContent :: FilePath -> IO Text
 loadFileContent = TIO.readFile
 
--- FIXME FIXME
--- FIXME: no need IO
--- Parse the frontmatter of a file and check if it's a gophermap
-isGophermapFile :: Text -> IO Bool
-isGophermapFile _ =
-  pure False
-
--- | Remove the gophermap syntax from a file.
---
--- This helps ensure that gopher protocol code doesn't appear in search results when all we care about is the labels of menu items.
---
--- We process lines that have tabs and extract the label before the tab.
-removeGophermapSyntax :: Text -> Text
-removeGophermapSyntax =
-  T.unlines
-    . map
-      ( \line ->
-          let (label, _) = T.breakOn "\t" line
-           in T.drop 1 label
-      )
-    . T.lines
-
 -- Main entrypoint. Should also have a prefix about search results when blank...
-getSearchResults :: Text -> AbsolutePath -> AbsolutePath -> IO [SearchResult]
-getSearchResults query sourceDirectoryAbsolutePath absoluteOutputPath = do
-  documentResults <- searchDocuments (T.words query) sourceDirectoryAbsolutePath absoluteOutputPath
+getSearchResults :: Maybe (Text -> Text) -> Text -> AbsolutePath -> AbsolutePath -> IO [SearchResult]
+getSearchResults maybeFilterDocuments query sourceDirectoryAbsolutePath absoluteOutputPath = do
+  documentResults <- searchDocuments maybeFilterDocuments (T.words query) sourceDirectoryAbsolutePath absoluteOutputPath
   let prunedResults = filter (\(_, _,  _, s, _) -> s >= scoreThreshold) documentResults
   pure $ searchResponse absoluteOutputPath query $ L.sortOn (\(_, _, _, s, _) -> negate s) prunedResults
 
