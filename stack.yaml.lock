@@ -12,13 +12,6 @@ packages:
   original:
     hackage: tomland-1.3.3.2@sha256:8a7924fb8ced9d82810f603cf195cd26b89a248b685ec21b99ffb28df3ea7c1a,9474
 - completed:
-    hackage: xml-conduit-writer-0.1.1.5@sha256:7b62f92e91d5f7c2c4440b2021d6b9309f9966598b110017b2cbcf3fcd1107df,1340
-    pantry-tree:
-      sha256: c7d0658555a2bbef4fecac9b7763d1acef7eac63f52dd15096f266776b7ce37e
-      size: 278
-  original:
-    hackage: xml-conduit-writer-0.1.1.5@sha256:7b62f92e91d5f7c2c4440b2021d6b9309f9966598b110017b2cbcf3fcd1107df,1340
-- completed:
     hackage: validation-selective-0.2.0.0@sha256:e1ab5482dede8bf676d729a09109c7c5f798363b9d458e4197a27afb8b48fdd3,3907
     pantry-tree:
       sha256: c5f1ddcb6a721cdb12cdec1e12af3ad7dcc936745e3fd53e5dd09b4a12b83bd5

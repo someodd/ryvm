@@ -86,8 +86,6 @@ library
     , unordered-containers
     , vector
     , word-wrap
-    , xml-conduit
-    , xml-conduit-writer
     , yaml
   default-language: GHC2021
 
@@ -148,8 +146,6 @@ executable ryvm
     , unordered-containers
     , vector
     , word-wrap
-    , xml-conduit
-    , xml-conduit-writer
     , yaml
   default-language: GHC2021
 
@@ -209,7 +205,5 @@ test-suite bore-test
     , unordered-containers
     , vector
     , word-wrap
-    , xml-conduit
-    , xml-conduit-writer
     , yaml
   default-language: GHC2021
