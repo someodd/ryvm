@@ -251,12 +251,12 @@ getTxtFiles dir = do
 
 -- Load the content of a file
 loadFileContent :: FilePath -> IO Text
-loadFileContent = TIO.readFile
+loadFileContent filePath = T.toLower <$> TIO.readFile filePath
 
 -- Main entrypoint. Should also have a prefix about search results when blank...
 getSearchResults :: Maybe (Text -> Text) -> Text -> AbsolutePath -> AbsolutePath -> IO [SearchResult]
 getSearchResults maybeFilterDocuments query sourceDirectoryAbsolutePath absoluteOutputPath = do
-  documentResults <- searchDocuments maybeFilterDocuments (T.words query) sourceDirectoryAbsolutePath absoluteOutputPath
+  documentResults <- searchDocuments maybeFilterDocuments (T.words . T.toLower $ query) sourceDirectoryAbsolutePath absoluteOutputPath
   let prunedResults = filter (\(_, _,  _, s, _) -> s >= scoreThreshold) documentResults
   pure $ searchResponse absoluteOutputPath query $ L.sortOn (\(_, _, _, s, _) -> negate s) prunedResults
 

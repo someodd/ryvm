@@ -65,7 +65,6 @@ dependencies:
   - commonmark-extensions
   - neat-interpolation
   - yaml
-  - spacecookie
   - edit-distance
   - safe
   - mime-types
