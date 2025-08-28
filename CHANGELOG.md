@@ -1,8 +1,10 @@
 # Changelog
+## [0.44.0.0] - 2025-08-27
 
-I try to only note changes you may actually notice as a
-user in the changelog.
+### Added
+- Initial release
 
 ## [Unreleased]
 
-Initial release.
+[unreleased]: https://github.com/someodd/bore/compare/v0.44.0.0...HEAD
+[0.44.0.0]: https://github.com/someodd/bore/releases/tag/v0.44.0.0
