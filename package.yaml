@@ -1,14 +1,14 @@
 name: ryvm
-version: 0.44.0.0
+version: 0.1.0.0
 synopsis: Rank You Very Much. Like Google, but for your files. Formally verified. Properly tested.
 description: |
-  Static site builder, but for gopherholes. Manage phlogs with tags, use the Markdown renderer and Mustache templating system.
-homepage: https://github.com/someodd/bore
-bug-reports: https://github.com/someodd/bore/issues
+  Like Google, but a Unix-y tool for your local storage.
+homepage: https://github.com/someodd/ryvm
+bug-reports: https://github.com/someodd/ryvm/issues
 license: GPL-3.0-only
 license-file: LICENSE
 author: someodd
-maintainer: someodd@pm.pm
+maintainer: hi@someodd.zip
 category: Network
 extra-source-files:
   - README.md
@@ -97,7 +97,7 @@ executables:
     default-language: GHC2021
 
 tests:
-  bore-test:
+  ryvm-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N

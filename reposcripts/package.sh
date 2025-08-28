@@ -15,7 +15,7 @@ DISTRO="$(lsb_release -si)"
 # Extract the version from package.yaml
 VERSION=$(awk '/^version:/ {print $2}' package.yaml)
 
-OUTPUT_PATH="bore_${VERSION}_amd64_${DISTRO}_kernel${KERNEL}_libc${LIBC}.deb"
+OUTPUT_PATH="ryvm_${VERSION}_amd64_${DISTRO}_kernel${KERNEL}_libc${LIBC}.deb"
 
 # Set the temporary package directory variable
 TEMPORARY_PKG_DIR=package
@@ -32,11 +32,11 @@ mkdir -p $TEMPORARY_PKG_DIR/var/gopher/output
 cp ./bin/ryvm $TEMPORARY_PKG_DIR/usr/local/bin/ryvm
 
 # Run fpm to create the Debian package.
-fpm -s dir -t deb -n bore -v ${VERSION} \
-    --description "Bore gopherhole builder. Built on ${DISTRO}, Kernel ${KERNEL}, libc ${LIBC}" \
+fpm -s dir -t deb -n ryvm -v ${VERSION} \
+    --description "Rank You Very Much. Built on ${DISTRO}, Kernel ${KERNEL}, libc ${LIBC}" \
     --depends "libc6" \
     --maintainer "someodd <someodd@pm.me>" \
-    --url "http://www.someodd.zip/showcase/ryvm" \
+    --url "https://github.com/someodd/ryvm" \
     --license "GPL" \
     -p "${OUTPUT_PATH}" \
     -C $TEMPORARY_PKG_DIR \

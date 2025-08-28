@@ -35,8 +35,8 @@ if [ -z "$CURRENT_VERSION" ]; then
     echo >> CHANGELOG.md
     echo "## [Unreleased]" >> CHANGELOG.md
     echo >> CHANGELOG.md
-    echo "[unreleased]: https://github.com/someodd/bore/compare/v$NEW_VERSION...HEAD" >> CHANGELOG.md
-    echo "[$NEW_VERSION]: https://github.com/someodd/bore/releases/tag/v$NEW_VERSION" >> CHANGELOG.md
+    echo "[unreleased]: https://github.com/someodd/ryvm/compare/v$NEW_VERSION...HEAD" >> CHANGELOG.md
+    echo "[$NEW_VERSION]: https://github.com/someodd/ryvm/releases/tag/v$NEW_VERSION" >> CHANGELOG.md
 else
     # Update the Unreleased section to new version
     sed -i "s/^## \[Unreleased\]/## [$NEW_VERSION] - $(date +%Y-%m-%d)/" CHANGELOG.md
@@ -45,8 +45,8 @@ else
     sed -i "/^## \[$NEW_VERSION\]/i## [Unreleased]\n" CHANGELOG.md
 
     # Update the unreleased comparison link
-    sed -i "s|\[unreleased\]: .*|[unreleased]: https://github.com/someodd/bore/compare/v$NEW_VERSION...HEAD|" CHANGELOG.md
+    sed -i "s|\[unreleased\]: .*|[unreleased]: https://github.com/someodd/ryvm/compare/v$NEW_VERSION...HEAD|" CHANGELOG.md
 
     # Add new version comparison link
-    sed -i "/\[unreleased\]: /a[$NEW_VERSION]: https://github.com/someodd/bore/compare/v$CURRENT_VERSION...v$NEW_VERSION" CHANGELOG.md
+    sed -i "/\[unreleased\]: /a[$NEW_VERSION]: https://github.com/someodd/ryvm/compare/v$CURRENT_VERSION...v$NEW_VERSION" CHANGELOG.md
 fi

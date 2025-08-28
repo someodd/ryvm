@@ -6,7 +6,7 @@ Search using standard input, get results via standard output in TSV format.
 
 This project is in alpha. It is not optimized, the code is not clean, etc. It's a mess. The API may change drastically.
 
-This is being ported over my [bore](https://github.com/someodd/bore) project. I eventually want it to be a dependency of `bore`.
+Ported from my [bore](https://github.com/someodd/bore) project.
 
 For now try this command:
 

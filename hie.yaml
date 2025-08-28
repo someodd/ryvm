@@ -1,11 +1,11 @@
 cradle:
   stack:
     - path: "./"
-      component: "bore:lib"
+      component: "ryvm:lib"
     - path: "./"
-      component: "bore:bore"
+      component: "ryvm:ryvm"
     - path: "./"
-      component: "bore:bore-test"
+      component: "ryvm:ryvm-test"
 
 ghc-options:
   "$everything": "-threaded -rtsopts -with-rtsopts=-N -Wall -Werror -fhaddock"
