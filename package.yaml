@@ -1,5 +1,5 @@
 name: ryvm
-version: 0.1.0.0
+version: 0.2.0.0
 synopsis: Rank You Very Much. Like Google, but for your files. Formally verified. Properly tested.
 description: |
   Like Google, but a Unix-y tool for your local storage.
