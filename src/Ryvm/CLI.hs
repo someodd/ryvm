@@ -1,25 +1,62 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Ryvm.CLI where
 
-import Ryvm.Text.Tsv (searchResultsToTsv)
+import Options.Applicative
 import Ryvm.Search
+import Ryvm.Text.Tsv (searchResultsToTsv)
 import qualified Data.Text as T
+import Data.Text.IO (putStrLn)
+import Data.List.Split (splitOn)
 
-{- | Function which takes in the file path to a directory and a query string and returns the results, all via stdin/out. -}
-query :: IO ()
-query = do
-    -- Get the file path and query from STDIN.
-    input <- getContents
-    let
-        inputLines = lines input
-        (path, q') =
-            case inputLines of
-                (piss:qi:_) -> (piss, qi)
-                _ -> ("src", "ryvm")
-        q = T.pack q'
-    
-    -- Get the search results
-    results <- getSearchResults Nothing q path path
-    
+data Options = Options
+  { optStdin :: Bool
+  , optIsRelative :: Bool
+  , optExtWhitelist :: [String]
+  , optLocation :: Maybe FilePath
+  , optQuery :: Maybe String
+  }
+
+optionsParser :: Parser Options
+optionsParser = Options
+    <$> switch
+        ( long "stdin"
+       <> help "Read location and query from stdin" )
+    <*> switch
+        ( long "make-relative"
+       <> help "Make result paths relative to the search location" )
+    <*> (splitOn "," <$> strOption
+        ( long "ext-whitelist"
+       <> value "txt"
+       <> showDefault
+       <> help "Comma-separated list of file extensions to search" ))
+    <*> optional (argument str (metavar "LOCATION"))
+    <*> optional (argument str (metavar "QUERY"))
+
+run :: IO ()
+run = do
+    opts <- execParser optsParserInfo
+    (location, queryStr) <- getInput opts
+    let query = T.pack queryStr
+    results <- getSearchResults (optIsRelative opts) (optExtWhitelist opts) Nothing query location location
     let resultsTsv = searchResultsToTsv results
-    -- Print each line to stdout
-    mapM_ (putStrLn . T.unpack) (T.lines resultsTsv)
+    mapM_ Data.Text.IO.putStrLn (T.lines resultsTsv)
+
+getInput :: Options -> IO (FilePath, String)
+getInput opts
+    | optStdin opts = do
+        input <- getContents
+        let inputLines = lines input
+        case inputLines of
+            (p:q:_) -> return (p, q)
+            _ -> error "stdin mode requires two lines: location and query"
+    | otherwise =
+        case (optLocation opts, optQuery opts) of
+            (Just loc, Just q) -> return (loc, q)
+            _ -> error "LOCATION and QUERY arguments are required when not using --stdin"
+
+
+optsParserInfo :: ParserInfo Options
+optsParserInfo = info (optionsParser <**> helper)
+    ( fullDesc
+   <> progDesc "Search for files in a directory and rank them by relevance."
+   <> header "ryvm - Rank You Very Much" )

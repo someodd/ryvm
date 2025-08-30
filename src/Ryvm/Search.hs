@@ -99,7 +99,7 @@ computeSelectorScore keywords selector =
     highlightedSelector =
       snd $ foldl
         (\(offset, acc) (word, indx, _) ->
-            let 
+            let
                 -- Calculate start position, adjusted by the offset
                 startPos = T.length (T.unwords $ take indx selectorWords') + offset + 1
                 endPos = startPos + T.length word
@@ -107,7 +107,7 @@ computeSelectorScore keywords selector =
                 (toHighlight, suffix) = splitAt (endPos - startPos) rest
                 -- Increment offset by the added length of the brackets
                 addedBrackets = T.length "[" + T.length "]"
-            in 
+            in
                 (offset + addedBrackets, prefix <> "[" <> toHighlight <> "]" <> suffix)
         )
         (0, selector)
@@ -208,14 +208,16 @@ addContext acc cs =
 -- ADD FUNCTION WHERE IF TEXT -> BOOL IS TRUE THEN APPLY FILTER FUNCTION TEXT -> TEXT FIXME
 -- | Function to process multiple documents
 searchDocuments
-  :: Maybe (Text -> Text)
+  :: Bool
+  -> [String]
+  -> Maybe (Text -> Text)
   -> [Text]
   -> AbsolutePath
   -> AbsolutePath
   -> IO [(FilePath, String, Bool, RankScore, [Text])]
   -- ^ The file path, the highlighted selector, whether it's a menu, the score, and the context snippets.
-searchDocuments maybeFilterDocuments keywords _ absoluteOutputPath = do
-  docPaths <- getTxtFiles absoluteOutputPath
+searchDocuments isRelative extWhitelist maybeFilterDocuments keywords sourceDirectoryAbsolutePath _ = do
+  docPaths <- getWhitelistedFiles extWhitelist sourceDirectoryAbsolutePath
   docs <-
     mapM
       ( \fp -> do
@@ -227,36 +229,37 @@ searchDocuments maybeFilterDocuments keywords _ absoluteOutputPath = do
   return $
     map
       ( \(fp, _, content) ->
-          let relativePath = makeRelative absoluteOutputPath fp
-              (highlightedSelector, score, contexts) = rankDocument relativePath keywords content
+          let
+              relativePath' = if isRelative then makeRelative sourceDirectoryAbsolutePath fp else fp
+              (highlightedSelector, score, contexts) = rankDocument relativePath' keywords content
               nonOverlappingContexts = combineContexts contexts
               contextTexts = map csText nonOverlappingContexts
-           in (fp, highlightedSelector, False, score, contextTexts)
+           in (relativePath', highlightedSelector, False, score, contextTexts)
       )
       docs
 
--- Recursively search for .txt files in a directory
-getTxtFiles :: FilePath -> IO [FilePath]
-getTxtFiles dir = do
+-- Recursively search for files with whitelisted extensions in a directory
+getWhitelistedFiles :: [String] -> FilePath -> IO [FilePath]
+getWhitelistedFiles extWhitelist dir = do
   contents <- listDirectory dir
   paths <-
     mapM
       ( \name -> do
           let path = dir </> name
           isDir <- doesDirectoryExist path
-          if isDir then getTxtFiles path else return [path]
+          if isDir then getWhitelistedFiles extWhitelist path else return [path]
       )
       contents
-  return $ filter (\f -> takeExtension f == ".txt") (concat paths)
+  return $ filter (\f -> takeExtension f `elem` map ('.':) extWhitelist) (concat paths)
 
 -- Load the content of a file
 loadFileContent :: FilePath -> IO Text
 loadFileContent filePath = T.toLower <$> TIO.readFile filePath
 
 -- Main entrypoint. Should also have a prefix about search results when blank...
-getSearchResults :: Maybe (Text -> Text) -> Text -> AbsolutePath -> AbsolutePath -> IO [SearchResult]
-getSearchResults maybeFilterDocuments query sourceDirectoryAbsolutePath absoluteOutputPath = do
-  documentResults <- searchDocuments maybeFilterDocuments (T.words . T.toLower $ query) sourceDirectoryAbsolutePath absoluteOutputPath
+getSearchResults :: Bool -> [String] -> Maybe (Text -> Text) -> Text -> AbsolutePath -> AbsolutePath -> IO [SearchResult]
+getSearchResults isRelative extWhitelist maybeFilterDocuments query sourceDirectoryAbsolutePath absoluteOutputPath = do
+  documentResults <- searchDocuments isRelative extWhitelist maybeFilterDocuments (T.words . toLower $ query) sourceDirectoryAbsolutePath absoluteOutputPath
   let prunedResults = filter (\(_, _,  _, s, _) -> s >= scoreThreshold) documentResults
   pure $ searchResponse absoluteOutputPath query $ L.sortOn (\(_, _, _, s, _) -> negate s) prunedResults
 
